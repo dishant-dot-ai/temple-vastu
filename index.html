@@ -262,7 +262,7 @@
         });
 
         // Auto-calculate when any input changes
-        document.querySelectorAll('input[type="text" inputmode="numeric"]').forEach(el => {
+        document.querySelectorAll('input[type="text"]').forEach(el => {
             el.addEventListener('input', () => calculate());
         });
         document.getElementById("moolnayak").addEventListener('change', () => calculate());
@@ -308,6 +308,11 @@
         document.getElementById("composite-inputs").style.display = mode === "composite" ? "block" : "none";
         document.getElementById("decimal-inputs").style.display = mode === "decimal" ? "block" : "none";
         document.getElementById("inches-inputs").style.display = mode === "inches" ? "block" : "none";
+
+        // Update inputmode: show decimal keyboard only in Decimal Feet mode
+        document.querySelectorAll('input[type="text"]').forEach(el => {
+            el.setAttribute('inputmode', mode === 'decimal' ? 'decimal' : 'numeric');
+        });
 
         // Convert values to new mode
         if (lIn > 0 || wIn > 0) {
