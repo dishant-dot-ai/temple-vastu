@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jain Temple Vastu Calculator</title>
+    <style>
+        :root {
+            --primary: #D35400; /* Saffron/Orange */
+            --bg: #FDFBF7; /* Off-white */
+            --card: #FFFFFF;
+            --text: #2C3E50;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary);
+        }
+        h1 { text-align: center; color: var(--primary); font-size: 1.5rem; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23555555' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+        input[type="radio"] {
+            width: auto;
+            padding: 0;
+            border: none;
+        }
+        select option {
+            background-color: #fff;
+            color: var(--text);
+        }
+        
+        #results { margin-top: 25px; display: none; }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-label { color: #7F8C8D; font-size: 0.9rem; }
+        .result-value { font-weight: bold; text-align: right; }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .good { background-color: #D4EFDF; color: #196F3D; }
+        .bad { background-color: #FADBD8; color: #943126; }
+        .neutral { background-color: #FCF3CF; color: #9A7D0A; }
+        .medium { background-color: #FCF3CF; color: #9A7D0A; }
+
+        @media (max-width: 400px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Temple Vastu Calculator</h1>
+    
+    <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
+        <label style="margin-bottom: 0; white-space: nowrap;">Input Mode</label>
+        <select id="input-mode" onchange="toggleInputMode()" style="flex: 1; background-color: #fff;">
+            <option value="composite">Feet + Inches</option>
+            <option value="decimal">Decimal Feet</option>
+            <option value="inches">Inches Only</option>
+        </select>
+    </div>
+
+    <div id="composite-inputs">
+        <div class="input-group">
+            <label>Length</label>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1; position: relative;">
+                    <input type="number" id="length-ft" min="0" step="1" placeholder="10" style="padding-right: 35px;">
+                    <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">ft</span>
+                </div>
+                <div style="flex: 1; position: relative;">
+                    <input type="number" id="length-in" min="0" max="11" step="1" placeholder="6" style="padding-right: 35px;">
+                    <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">in</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Width</label>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1; position: relative;">
+                    <input type="number" id="width-ft" min="0" step="1" placeholder="12" style="padding-right: 35px;">
+                    <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">ft</span>
+                </div>
+                <div style="flex: 1; position: relative;">
+                    <input type="number" id="width-in" min="0" max="11" step="1" placeholder="3" style="padding-right: 35px;">
+                    <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="decimal-inputs" style="display: none;">
+        <div class="input-group">
+            <label>Length</label>
+            <div style="position: relative;">
+                <input type="number" id="length-dec" min="0.01" step="0.01" placeholder="10.5" style="padding-right: 35px;">
+                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">ft</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Width</label>
+            <div style="position: relative;">
+                <input type="number" id="width-dec" min="0.01" step="0.01" placeholder="12.25" style="padding-right: 35px;">
+                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">ft</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="inches-inputs" style="display: none;">
+        <p style="font-size: 0.8rem; color: #999; margin: 0 0 10px 0;">Tip: Multiply feet by 12 to get inches. E.g. 10 ft 6 in = (10 × 12) + 6 = 126 in</p>
+        <div class="input-group">
+            <label>Length</label>
+            <div style="position: relative;">
+                <input type="number" id="length-inches" min="1" step="0.01" placeholder="126" style="padding-right: 35px;">
+                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">in</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Width</label>
+            <div style="position: relative;">
+                <input type="number" id="width-inches" min="1" step="0.01" placeholder="147" style="padding-right: 35px;">
+                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">in</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Moolnayak (Tirthankara)</label>
+        <select id="moolnayak">
+            </select>
+    </div>
+
+
+    <p id="input-prompt" style="color: #D35400; font-size: 0.85rem; margin: 20px 0 0 0; text-align: center;">Please enter length and width to see results</p>
+    <div id="results" style="display: none;">
+        <h3 style="color: #D35400;">Calculated Attributes</h3>
+        <div id="output-list"></div>
+    </div>
+</div>
+
+<script>
+    const NAKSHATRA_DATA = [
+      { id: 1, name: "Ashwini", dir: "North", gan: "Deva", vyay: "Shanta", nadi: "Aadi", rashi: "Aries (Mesh)" },
+      { id: 2, name: "Bharani", dir: "North", gan: "Manushya", vyay: "Pora", nadi: "Madhya", rashi: "Aries (Mesh)" },
+      { id: 3, name: "Krutika", dir: "East", gan: "Rakshasa", vyay: "Pradyota", nadi: "Antya", rashi: "Aries (Mesh)" },
+      { id: 4, name: "Rohini", dir: "East", gan: "Manushya", vyay: "Shriyanand", nadi: "Antya", rashi: "Taurus (Vrushabh)" },
+      { id: 5, name: "Mrugashir", dir: "East", gan: "Deva", vyay: "Manohara", nadi: "Madhya", rashi: "Taurus (Vrushabh)" },
+      { id: 6, name: "Ardra", dir: "East", gan: "Manushya", vyay: "Shrivatsa", nadi: "Aadi", rashi: "Gemini (Mithun)" },
+      { id: 7, name: "Punarvasu", dir: "East", gan: "Deva", vyay: "Vibhava", nadi: "Aadi", rashi: "Gemini (Mithun)" },
+      { id: 8, name: "Pushya", dir: "East", gan: "Rakshasa", vyay: "Chintatmaka", nadi: "Madhya", rashi: "Cancer (Kark)" },
+      { id: 9, name: "Ashlesha", dir: "East", gan: "Rakshasa", vyay: "Shanta", nadi: "Antya", rashi: "Cancer (Kark)" },
+      { id: 10, name: "Magha", dir: "South", gan: "Rakshasa", vyay: "Pora", nadi: "Antya", rashi: "Leo (Simha)" },
+      { id: 11, name: "Purva Phalguni", dir: "South", gan: "Manushya", vyay: "Pradyota", nadi: "Madhya", rashi: "Leo (Simha)" },
+      { id: 12, name: "Uttara Phalguni", dir: "South", gan: "Manushya", vyay: "Shriyanand", nadi: "Aadi", rashi: "Leo (Simha)" },
+      { id: 13, name: "Hasta", dir: "South", gan: "Deva", vyay: "Manohara", nadi: "Aadi", rashi: "Virgo (Kanya)" },
+      { id: 14, name: "Chitra", dir: "South", gan: "Rakshasa", vyay: "Shrivatsa", nadi: "Madhya", rashi: "Virgo (Kanya)" },
+      { id: 15, name: "Svati", dir: "South", gan: "Deva", vyay: "Vibhava", nadi: "Antya", rashi: "Virgo (Kanya)" },
+      { id: 16, name: "Vishakha", dir: "South", gan: "Rakshasa", vyay: "Chintatmaka", nadi: "Antya", rashi: "Libra (Tula)" },
+      { id: 17, name: "Anuradha", dir: "West", gan: "Deva", vyay: "Shanta", nadi: "Madhya", rashi: "Libra (Tula)" },
+      { id: 18, name: "Jyeshtha", dir: "West", gan: "Rakshasa", vyay: "Pora", nadi: "Aadi", rashi: "Scorpio (Vrushchik)" },
+      { id: 19, name: "Mula", dir: "West", gan: "Rakshasa", vyay: "Pradyota", nadi: "Aadi", rashi: "Scorpio (Vrushchik)" },
+      { id: 20, name: "Purva Ashadha", dir: "West", gan: "Manushya", vyay: "Shriyanand", nadi: "Madhya", rashi: "Sagittarius (Dhan)" },
+      { id: 21, name: "Uttara Ashadha", dir: "West", gan: "Manushya", vyay: "Manohara", nadi: "Antya", rashi: "Sagittarius (Dhan)" },
+      { id: 22, name: "Shravan", dir: "West", gan: "Deva", vyay: "Shrivatsa", nadi: "Antya", rashi: "Sagittarius (Dhan)" },
+      { id: 23, name: "Dhanishta", dir: "North", gan: "Rakshasa", vyay: "Vibhava", nadi: "Madhya", rashi: "Capricorn (Makar)" },
+      { id: 24, name: "Shatabhisha", dir: "North", gan: "Rakshasa", vyay: "Chintatmaka", nadi: "Aadi", rashi: "Capricorn (Makar)" },
+      { id: 25, name: "Purva Bhadrapada", dir: "North", gan: "Manushya", vyay: "Shanta", nadi: "Aadi", rashi: "Aquarius (Kumbh)" },
+      { id: 26, name: "Uttara Bhadrapada", dir: "North", gan: "Manushya", vyay: "Pora", nadi: "Madhya", rashi: "Aquarius (Kumbh)" },
+      { id: 27, name: "Revati", dir: "North", gan: "Deva", vyay: "Pradyota", nadi: "Antya", rashi: "Pisces (Meen)" }
+    ];
+
+    const TIRTHANKARAS = [
+      { name: "1. Rushabhdev", nak: "Uttara Ashadha" },
+      { name: "2. Ajitnath", nak: "Rohini" },
+      { name: "3. Sambhavnath", nak: "Mrugashir" },
+      { name: "4. Abhinandannath", nak: "Punarvasu" },
+      { name: "5. Sumatinath", nak: "Magha" },
+      { name: "6. Padmaprabhu", nak: "Chitra" },
+      { name: "7. Suparshvanath", nak: "Vishakha" },
+      { name: "8. Chandraprabhu", nak: "Anuradha" },
+      { name: "9. Suvidhinath", nak: "Mula" },
+      { name: "10. Shitalnath", nak: "Purva Ashadha" },
+      { name: "11. Shreyansnath", nak: "Shravan" },
+      { name: "12. Vasupujya Swami", nak: "Shatabhisha" },
+      { name: "13. Vimalnath", nak: "Uttara Bhadrapada" },
+      { name: "14. Anantnath", nak: "Revati" },
+      { name: "15. Dharmanath", nak: "Pushya" },
+      { name: "16. Shantinath", nak: "Bharani" },
+      { name: "17. Kunthunath", nak: "Krutika" },
+      { name: "18. Aranath", nak: "Revati" },
+      { name: "19. Mallinath", nak: "Ashwini" },
+      { name: "20. Munisuvrat Swami", nak: "Shravan" },
+      { name: "21. Naminath", nak: "Ashwini" },
+      { name: "22. Neminath", nak: "Chitra" },
+      { name: "23. Parshvanath", nak: "Vishakha" },
+      { name: "24. Mahavir Swami", nak: "Uttara Phalguni" }
+    ];
+
+    const ANIMOSITY_PAIRS = [
+        ["Chitra", "Hasta"], ["Uttara Phalguni", "Ashwini"], ["Svati", "Rohini"],
+        ["Uttara Ashadha", "Shravan"], ["Punarvasu", "Pushya"], ["Jyeshtha", "Vishakha"],
+        ["Purva Ashadha", "Shatabhisha"]
+    ];
+
+    const AYA_NAMES = ["Dhwanksha", "Dhwaj", "Dhoomra", "Sinh", "Shwan", "Vrushabh", "Khar", "Gaja"];
+    const TARA_NAMES = ["Ananda", "Shrota", "Manohara", "Kroora", "Vijaya", "Kalalodaulpa", "Pakhini", "Rakshasi", "Bala"];
+
+    window.onload = function() {
+        const select = document.getElementById("moolnayak");
+        TIRTHANKARAS.forEach(t => {
+            let option = document.createElement("option");
+            option.value = t.nak;
+            option.text = t.name;
+            select.appendChild(option);
+        });
+
+        // Auto-calculate when any input changes
+        document.querySelectorAll('input[type="number"]').forEach(el => {
+            el.addEventListener('input', () => calculate());
+        });
+        document.getElementById("moolnayak").addEventListener('change', () => calculate());
+
+        // Auto-fill inches with 0 when user leaves the ft field
+        document.getElementById("length-ft").addEventListener('blur', () => {
+            const inEl = document.getElementById("length-in");
+            if (document.getElementById("length-ft").value !== "" && inEl.value === "") inEl.value = 0;
+        });
+        document.getElementById("width-ft").addEventListener('blur', () => {
+            const inEl = document.getElementById("width-in");
+            if (document.getElementById("width-ft").value !== "" && inEl.value === "") inEl.value = 0;
+        });
+    };
+
+    function getCurrentInches() {
+        // Read current values from whichever mode has data, return [lengthInches, widthInches]
+        const cLft = parseFloat(document.getElementById("length-ft").value) || 0;
+        const cLin = parseFloat(document.getElementById("length-in").value) || 0;
+        const cWft = parseFloat(document.getElementById("width-ft").value) || 0;
+        const cWin = parseFloat(document.getElementById("width-in").value) || 0;
+        const dL = parseFloat(document.getElementById("length-dec").value) || 0;
+        const dW = parseFloat(document.getElementById("width-dec").value) || 0;
+        const iL = parseFloat(document.getElementById("length-inches").value) || 0;
+        const iW = parseFloat(document.getElementById("width-inches").value) || 0;
+
+        const compL = (cLft * 12) + cLin;
+        const compW = (cWft * 12) + cWin;
+        const decL = dL * 12;
+        const decW = dW * 12;
+
+        // Return whichever has values
+        if (compL > 0 || compW > 0) return [compL, compW];
+        if (decL > 0 || decW > 0) return [decL, decW];
+        if (iL > 0 || iW > 0) return [iL, iW];
+        return [0, 0];
+    }
+
+    function toggleInputMode() {
+        const [lIn, wIn] = getCurrentInches();
+        const mode = document.getElementById("input-mode").value;
+
+        document.getElementById("composite-inputs").style.display = mode === "composite" ? "block" : "none";
+        document.getElementById("decimal-inputs").style.display = mode === "decimal" ? "block" : "none";
+        document.getElementById("inches-inputs").style.display = mode === "inches" ? "block" : "none";
+
+        // Convert values to new mode
+        if (lIn > 0 || wIn > 0) {
+            if (mode === "composite") {
+                document.getElementById("length-ft").value = Math.floor(lIn / 12);
+                document.getElementById("length-in").value = Math.round(lIn % 12);
+                document.getElementById("width-ft").value = Math.floor(wIn / 12);
+                document.getElementById("width-in").value = Math.round(wIn % 12);
+            } else if (mode === "decimal") {
+                document.getElementById("length-dec").value = (lIn / 12).toFixed(2);
+                document.getElementById("width-dec").value = (wIn / 12).toFixed(2);
+            } else {
+                document.getElementById("length-inches").value = Math.round(lIn);
+                document.getElementById("width-inches").value = Math.round(wIn);
+            }
+        }
+
+        hideResults();
+        calculate();
+    }
+
+    function clearValidation() {
+        document.querySelectorAll('.validation-highlight').forEach(el => {
+            el.style.borderColor = '#ddd';
+            el.classList.remove('validation-highlight');
+        });
+        const msg = document.getElementById("validation-msg");
+        if (msg) msg.remove();
+    }
+
+    function showValidation(fields, message) {
+        clearValidation();
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.borderColor = '#D35400';
+                el.classList.add('validation-highlight');
+            }
+        });
+        const msg = document.createElement("p");
+        msg.id = "validation-msg";
+        msg.style.cssText = "color: #D35400; font-size: 0.85rem; margin: 8px 0 0 0; text-align: center;";
+        msg.textContent = message;
+        document.getElementById("results").insertAdjacentElement("beforebegin", msg);
+    }
+
+    function hideResults() {
+        clearValidation();
+        document.getElementById("results").style.display = "none";
+        document.getElementById("input-prompt").style.display = "block";
+    }
+
+    function calculate() {
+        clearValidation();
+        const mode = document.getElementById("input-mode").value;
+        let L_in, W_in;
+
+        if (mode === "composite") {
+            const lFtEl = document.getElementById("length-ft");
+            const lInEl = document.getElementById("length-in");
+            const wFtEl = document.getElementById("width-ft");
+            const wInEl = document.getElementById("width-in");
+
+
+            const lEmpty = lFtEl.value === "";
+            const wEmpty = wFtEl.value === "";
+            
+            if (lEmpty || wEmpty) { hideResults(); return; }
+
+            const L_ft = parseFloat(lFtEl.value) || 0;
+            const L_in_extra = parseFloat(lInEl.value) || 0;
+            const W_ft = parseFloat(wFtEl.value) || 0;
+            const W_in_extra = parseFloat(wInEl.value) || 0;
+
+            if (L_ft < 0 || L_in_extra < 0) { showValidation(["length-ft", "length-in"], "Length cannot be negative"); return; }
+            if (W_ft < 0 || W_in_extra < 0) { showValidation(["width-ft", "width-in"], "Width cannot be negative"); return; }
+
+            L_in = (L_ft * 12) + L_in_extra;
+            W_in = (W_ft * 12) + W_in_extra;
+
+        } else if (mode === "decimal") {
+            const lEl = document.getElementById("length-dec");
+            const wEl = document.getElementById("width-dec");
+
+            if (lEl.value === "" || wEl.value === "") { hideResults(); return; }
+
+            const L_dec = parseFloat(lEl.value);
+            const W_dec = parseFloat(wEl.value);
+
+            if (L_dec < 0) { showValidation(["length-dec"], "Length cannot be negative"); return; }
+            if (W_dec < 0) { showValidation(["width-dec"], "Width cannot be negative"); return; }
+
+            L_in = L_dec * 12;
+            W_in = W_dec * 12;
+        } else {
+            const lEl = document.getElementById("length-inches");
+            const wEl = document.getElementById("width-inches");
+
+            if (lEl.value === "" || wEl.value === "") { hideResults(); return; }
+
+            const L_raw = parseFloat(lEl.value);
+            const W_raw = parseFloat(wEl.value);
+
+            if (L_raw < 0) { showValidation(["length-inches"], "Length cannot be negative"); return; }
+            if (W_raw < 0) { showValidation(["width-inches"], "Width cannot be negative"); return; }
+
+            L_in = L_raw;
+            W_in = W_raw;
+        }
+
+        if (L_in <= 0 || W_in <= 0) { hideResults(); return; }
+
+        const area = Math.floor(L_in * W_in);
+
+        let ayaIdx = area % 8;
+        const ayaName = AYA_NAMES[ayaIdx];
+
+        let tempNakIdx = (area * 8) % 27; 
+        if (tempNakIdx === 0) tempNakIdx = 27;
+        const templeNak = NAKSHATRA_DATA.find(n => n.id === tempNakIdx);
+
+        const moolNakName = document.getElementById("moolnayak").value;
+        const moolNak = NAKSHATRA_DATA.find(n => n.name === moolNakName);
+
+        let animosity = "No";
+        ANIMOSITY_PAIRS.forEach(pair => {
+            if ((pair[0] === templeNak.name && pair[1] === moolNak.name) || 
+                (pair[1] === templeNak.name && pair[0] === moolNak.name)) {
+                animosity = "Yes";
+            }
+        });
+
+        let distance = (templeNak.id - moolNak.id + 27) % 27; 
+        let X = distance + 1;
+        let taraIdx = X % 9;
+        const taraName = TARA_NAMES[taraIdx];
+
+        let nadiResult = "Good";
+        const tn = templeNak.nadi;
+        const mn = moolNak.nadi;
+
+        if (tn === mn) {
+            if (tn === "Madhya") nadiResult = "Bad";
+            else nadiResult = "Medium";
+        }
+
+        const results = [
+            { label: "Total Area", val: (area / 144).toFixed(2) + " sq ft (" + area + " sq in)" },
+            { label: "Aya (Remainder " + (ayaIdx===0?8:ayaIdx) + ")", val: ayaName },
+            { label: "Temple Nakshatra", val: templeNak.name },
+            { label: "Direction", val: templeNak.dir },
+            { label: "Gan", val: templeNak.gan },
+            { label: "Moolnayak Nakshatra", val: moolNak.name },
+            { label: "Animosity (Vaira)", val: animosity, status: animosity === "Yes" ? "bad" : "good" },
+            { label: "Vyay", val: templeNak.vyay },
+            { label: "Tara (" + taraName + ")", val: "Distance: " + X },
+            { label: "Temple Nadi", val: templeNak.nadi },
+            { label: "Moolnayak Nadi", val: moolNak.nadi },
+            { label: "Nadi Chakra Compatibility", val: nadiResult, status: nadiResult.toLowerCase() },
+            { label: "Temple Rashi", val: templeNak.rashi },
+            { label: "Moolnayak Rashi", val: moolNak.rashi }
+        ];
+
+        let html = "";
+        results.forEach(r => {
+            let badge = "";
+            if (r.status) badge = `<span class="badge ${r.status}">${r.status.toUpperCase()}</span>`;
+            html += `<div class="result-item">
+                        <span class="result-label">${r.label}</span>
+                        <div class="result-value">${r.val} ${badge}</div>
+                     </div>`;
+        });
+
+        document.getElementById("output-list").innerHTML = html;
+        document.getElementById("input-prompt").style.display = "none";
+        document.getElementById("results").style.display = "block";
+    }
+</script>
+
+</body>
+</html>
