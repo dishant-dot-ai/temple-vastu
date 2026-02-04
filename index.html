@@ -110,11 +110,11 @@
             <label>Length</label>
             <div style="display: flex; gap: 10px;">
                 <div style="flex: 1; position: relative;">
-                    <input type="number" id="length-ft" min="0" step="1" placeholder="10" style="padding-right: 35px;">
+                    <input type="text" inputmode="numeric" id="length-ft" min="0" step="1" placeholder="10" style="padding-right: 35px;">
                     <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">ft</span>
                 </div>
                 <div style="flex: 1; position: relative;">
-                    <input type="number" id="length-in" min="0" max="11" step="1" placeholder="6" style="padding-right: 35px;">
+                    <input type="text" inputmode="numeric" id="length-in" min="0" max="11" step="1" placeholder="6" style="padding-right: 35px;">
                     <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">in</span>
                 </div>
             </div>
@@ -124,11 +124,11 @@
             <label>Width</label>
             <div style="display: flex; gap: 10px;">
                 <div style="flex: 1; position: relative;">
-                    <input type="number" id="width-ft" min="0" step="1" placeholder="12" style="padding-right: 35px;">
+                    <input type="text" inputmode="numeric" id="width-ft" min="0" step="1" placeholder="12" style="padding-right: 35px;">
                     <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">ft</span>
                 </div>
                 <div style="flex: 1; position: relative;">
-                    <input type="number" id="width-in" min="0" max="11" step="1" placeholder="3" style="padding-right: 35px;">
+                    <input type="text" inputmode="numeric" id="width-in" min="0" max="11" step="1" placeholder="3" style="padding-right: 35px;">
                     <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">in</span>
                 </div>
             </div>
@@ -139,14 +139,14 @@
         <div class="input-group">
             <label>Length</label>
             <div style="position: relative;">
-                <input type="number" id="length-dec" min="0.01" step="0.01" placeholder="10.5" style="padding-right: 35px;">
+                <input type="text" inputmode="numeric" id="length-dec" min="0.01" step="0.01" placeholder="10.5" style="padding-right: 35px;">
                 <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">ft</span>
             </div>
         </div>
         <div class="input-group">
             <label>Width</label>
             <div style="position: relative;">
-                <input type="number" id="width-dec" min="0.01" step="0.01" placeholder="12.25" style="padding-right: 35px;">
+                <input type="text" inputmode="numeric" id="width-dec" min="0.01" step="0.01" placeholder="12.25" style="padding-right: 35px;">
                 <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">ft</span>
             </div>
         </div>
@@ -157,14 +157,14 @@
         <div class="input-group">
             <label>Length</label>
             <div style="position: relative;">
-                <input type="number" id="length-inches" min="1" step="0.01" placeholder="126" style="padding-right: 35px;">
+                <input type="text" inputmode="numeric" id="length-inches" min="1" step="0.01" placeholder="126" style="padding-right: 35px;">
                 <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">in</span>
             </div>
         </div>
         <div class="input-group">
             <label>Width</label>
             <div style="position: relative;">
-                <input type="number" id="width-inches" min="1" step="0.01" placeholder="147" style="padding-right: 35px;">
+                <input type="text" inputmode="numeric" id="width-inches" min="1" step="0.01" placeholder="147" style="padding-right: 35px;">
                 <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 0.85rem;">in</span>
             </div>
         </div>
@@ -183,7 +183,7 @@
         <div id="output-list"></div>
     </div>
 </div>
-<p style="text-align: center; font-size: 0.75rem; color: #bbb; margin-top: 15px;">Built by (<a href="https://dishant.ai" style="color: #bbb; text-decoration: none;">dishant.ai</a>)</p>
+<p style="text-align: center; font-size: 0.75rem; color: #bbb; margin-top: 15px;">Built by Dishant Shah (<a href="https://dishant.ai" style="color: #bbb; text-decoration: none;">dishant.ai</a>)</p>
 
 <script>
     const NAKSHATRA_DATA = [
@@ -262,7 +262,7 @@
         });
 
         // Auto-calculate when any input changes
-        document.querySelectorAll('input[type="number"]').forEach(el => {
+        document.querySelectorAll('input[type="text" inputmode="numeric"]').forEach(el => {
             el.addEventListener('input', () => calculate());
         });
         document.getElementById("moolnayak").addEventListener('change', () => calculate());
@@ -485,6 +485,25 @@
         document.getElementById("input-prompt").style.display = "none";
         document.getElementById("results").style.display = "block";
     }
+
+    // Input filtering: only allow digits 0-9, and decimal point only in Decimal Feet mode
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+        input.addEventListener('input', function() {
+            const mode = document.getElementById('input-mode').value;
+            const allowDot = (mode === 'decimal');
+            let filtered = '';
+            let hasDot = false;
+            for (const ch of this.value) {
+                if (ch >= '0' && ch <= '9') {
+                    filtered += ch;
+                } else if (ch === '.' && allowDot && !hasDot) {
+                    filtered += ch;
+                    hasDot = true;
+                }
+            }
+            if (this.value !== filtered) this.value = filtered;
+        });
+    });
 </script>
 
 <script>
