@@ -85,6 +85,15 @@
         .neutral { background-color: #FCF3CF; color: #9A7D0A; }
         .medium { background-color: #FCF3CF; color: #9A7D0A; }
 
+        @media (max-width: 768px) {
+            .sticky-inputs {
+                position: sticky;
+                top: -1px;
+                background: var(--card);
+                z-index: 10;
+                padding-bottom: 10px;
+            }
+        }
         @media (max-width: 400px) {
             body { padding: 10px; }
             .container { padding: 15px; }
@@ -94,8 +103,9 @@
 <body>
 
 <div class="container">
+    <div class="sticky-inputs">
     <h1>Temple Vastu Calculator</h1>
-    
+
     <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
         <label style="margin-bottom: 0; white-space: nowrap;">Input Mode</label>
         <select id="input-mode" onchange="toggleInputMode()" style="flex: 1; background-color: #fff;">
@@ -175,7 +185,7 @@
         <select id="moolnayak">
             </select>
     </div>
-
+    </div>
 
     <p id="input-prompt" style="color: #D35400; font-size: 0.85rem; margin: 20px 0 0 0; text-align: center;">Please enter length and width to see results</p>
     <div id="results" style="display: none;">
