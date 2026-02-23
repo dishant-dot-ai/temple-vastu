@@ -262,6 +262,59 @@
     const AYA_NAMES = ["Dhwanksha", "Dhwaj", "Dhoomra", "Sinh", "Shwan", "Vrushabh", "Khar", "Gaja"];
     const TARA_NAMES = ["Ananda", "Shrota", "Manohara", "Kroora", "Vijaya", "Kalalodaulpa", "Pakhini", "Rakshasi", "Bala"];
 
+    const RASHI_SWAMI = {
+        "Leo (Simha)": "Surya",
+        "Cancer (Kark)": "Chandra",
+        "Aries (Mesh)": "Mangal",
+        "Scorpio (Vrushchik)": "Mangal",
+        "Gemini (Mithun)": "Budh",
+        "Virgo (Kanya)": "Budh",
+        "Sagittarius (Dhan)": "Guru",
+        "Pisces (Meen)": "Guru",
+        "Taurus (Vrushabh)": "Shukra",
+        "Libra (Tula)": "Shukra",
+        "Capricorn (Makar)": "Shani",
+        "Aquarius (Kumbh)": "Shani"
+    };
+
+    const SWAMI_RELATIONSHIPS = {
+        "Surya": {
+            friends: ["Chandra", "Guru", "Mangal"],
+            neutral: ["Budh"],
+            enemies: ["Shukra", "Shani"]
+        },
+        "Chandra": {
+            friends: ["Surya", "Budh"],
+            neutral: ["Guru", "Shukra", "Mangal", "Shani"],
+            enemies: []
+        },
+        "Mangal": {
+            friends: ["Surya", "Chandra", "Guru"],
+            neutral: ["Shukra", "Shani"],
+            enemies: ["Budh"]
+        },
+        "Budh": {
+            friends: ["Surya", "Shukra"],
+            neutral: ["Mangal", "Guru", "Shani"],
+            enemies: ["Chandra"]
+        },
+        "Guru": {
+            friends: ["Surya", "Chandra", "Mangal"],
+            neutral: ["Shani"],
+            enemies: ["Budh", "Shukra"]
+        },
+        "Shukra": {
+            friends: ["Budh", "Shani"],
+            neutral: ["Mangal", "Guru"],
+            enemies: ["Surya", "Chandra"]
+        },
+        "Shani": {
+            friends: ["Budh", "Shukra"],
+            neutral: ["Guru"],
+            enemies: ["Surya", "Chandra", "Mangal"]
+        }
+    };
+
     window.onload = function() {
         const select = document.getElementById("moolnayak");
         TIRTHANKARAS.forEach(t => {
@@ -469,6 +522,20 @@
             else nadiResult = "Medium";
         }
 
+        const templeSwami = RASHI_SWAMI[templeNak.rashi];
+        const moolSwami = RASHI_SWAMI[moolNak.rashi];
+        let swamiResult;
+        if (templeSwami === moolSwami) {
+            swamiResult = "Mitrabhav";
+        } else if (SWAMI_RELATIONSHIPS[templeSwami].friends.includes(moolSwami)) {
+            swamiResult = "Mitrabhav";
+        } else if (SWAMI_RELATIONSHIPS[templeSwami].neutral.includes(moolSwami)) {
+            swamiResult = "Samabhav";
+        } else {
+            swamiResult = "Shatrubhav";
+        }
+        const swamiStatus = swamiResult === "Mitrabhav" ? "good" : swamiResult === "Samabhav" ? "neutral" : "bad";
+
         const results = [
             { label: "Total Area", val: (area / 144).toFixed(2) + " sq ft (" + area + " sq in)" },
             { label: "Aya (Remainder " + (ayaIdx===0?8:ayaIdx) + ")", val: ayaName },
@@ -483,7 +550,10 @@
             { label: "Moolnayak Nadi", val: moolNak.nadi },
             { label: "Nadi Chakra Compatibility", val: nadiResult, status: nadiResult.toLowerCase() },
             { label: "Temple Rashi", val: templeNak.rashi },
-            { label: "Moolnayak Rashi", val: moolNak.rashi }
+            { label: "Moolnayak Rashi", val: moolNak.rashi },
+            { label: "Temple Swami", val: templeSwami },
+            { label: "Moolnayak Swami", val: moolSwami },
+            { label: "Compatibility (Rashi/Swami)", val: swamiResult, status: swamiStatus }
         ];
 
         let html = "";
